@@ -1,17 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Open Noom</title>
+  <meta charset="UTF-8" />
+  <title>Open App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      text-align: center;
+      padding-top: 4em;
+      color: #333;
+    }
+    h2 {
+      margin-bottom: 0.5em;
+    }
+    .app {
+      font-weight: bold;
+      color: #000;
+    }
+    code {
+      background: #f2f2f2;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font-size: 0.95em;
+    }
+    .hint {
+      margin-top: 1.5em;
+      color: #666;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Opening app…</h2>
+  <p id="status"></p>
+  <p class="hint">Example: <code>?app=noom</code></p>
+
   <script>
-    window.onload = function() {
-      window.location = "noom://";
-      setTimeout(function() {
-        window.location = "https://play.google.com/store/apps/details?id=com.wsl.noom";
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    // Friendly name → actual URL scheme mapping
+    const aliases = {
+      noom: "noom",
+      spotify: "spotify",
+      youtube: "vnd.youtube",
+      whatsapp: "whatsapp",
+      telegram: "tg",
+      signal: "sgnl",
+      maps: "geo"
+    };
+
+    const app = getParam("app");
+    const status = document.getElementById("status");
+
+    if (!app) {
+      status.innerHTML =
+        "No <span class='app'>app</span> parameter found.<br>" +
+        "Try: <code>?app=noom</code>";
+    } else {
+      const key = app.toLowerCase();
+      const scheme = (aliases[key] || key) + "://";
+
+      status.innerHTML =
+        "Trying to open <span class='app'>" + scheme + "</span>";
+
+      // Try to open the app
+      window.location = scheme;
+
+      // Fallback to Play Store search after delay
+      setTimeout(() => {
+        const fallback =
+          "https://play.google.com/store/search?q=" +
+          encodeURIComponent(app) +
+          "&c=apps";
+        window.location = fallback;
       }, 1500);
     }
   </script>
-</head>
-<body>
-  <p>Opening Noom app...</p>
+
 </body>
 </html>
